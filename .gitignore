@@ -8,6 +8,7 @@ venv/
 # Data & DBs (We want the folder structure, not the binary data)
 data/*.db
 data/*.sqlite
+data/*.json
 
 # IDEs
 .vscode/

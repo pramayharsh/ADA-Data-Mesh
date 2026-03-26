@@ -1,40 +1,32 @@
-from src.tools.setup_db import download_db
-from src.tools.db_tools import get_db_schema, run_query
-from src.utils.llm_client import query_llm
+from src.tools.db_tools import get_db_schema
+from src.agents.librarian import Librarian
+from src.agents.architect import Architect
 
 def main():
-    # 1. Initialize DB
-    download_db()
+    # 1. Setup Agents
+    full_schema = get_db_schema()
+    librarian = Librarian(full_schema)
+    architect = Architect()
     
-    # 2. Get Data Context
-    schema = get_db_schema()
+    # Index the database (Only happens once)
+    librarian.build_index()
     
-    # 3. Ask a question
-    user_question = "How many tracks are there in the database?"
+    # 2. User Interaction
+    user_question = "Which artist has the most tracks in the database?"
+    print(f"\nUser: {user_question}")
     
-    system_prompt = """
-    You are a SQL expert. 
-    Return ONLY the raw SQL query. 
-    Do not include markdown code blocks (like ```sql). 
-    Do not include any explanations.
-    """
-    user_prompt = f"Schema: {schema}\nQuestion: {user_question}"
+    # 3. Librarian finds relevant tables
+    relevant_schema = librarian.get_relevant_schema(user_question)
+    print(f"Librarian selected tables: {list(relevant_schema.keys())}")
     
-    print(f"Asking Groq: {user_question}")
-    sql = query_llm(system_prompt, user_prompt).strip()
-    
-    # Simple cleaning in case the LLM still includes markdown
-    sql = sql.replace("```sql", "").replace("```", "").strip()
-    
-    print(f"Groq generated SQL: {sql}")
-    
-    # 4. Run it
-    result = run_query(sql)
+    # 4. Architect writes and executes SQL
+    sql, result = architect.run_and_fix(user_question, relevant_schema)
     
     if result["status"] == "success":
-        print(f"Result from Database: {result['data']}")
+        print(f"Final SQL: {sql}")
+        print(f"Result: {result['data']}")
     else:
-        print(f"Error: {result['message']}")
+        print(f"System failed to answer: {result['message']}")
 
 if __name__ == "__main__":
     main()

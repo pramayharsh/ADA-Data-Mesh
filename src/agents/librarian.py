@@ -19,7 +19,12 @@ class Librarian:
         print("Librarian is cataloging the library (indexing database)...")
         for table_name, columns in self.schema.items():
             # 1. Ask LLM to describe the table
-            prompt = f"Table: {table_name}\nColumns: {columns}\nBriefly describe what this table stores."
+            prompt = f"""
+            Table: {table_name}
+            Columns: {columns}
+            Describe what this table stores in 1 sentence. 
+            Include potential business terms like 'Sales', 'Revenue', 'Customers', or 'Inventory' if they apply.
+            """
             description = query_llm("You are a database librarian.", prompt)
             
             # 2. Get vector for that description

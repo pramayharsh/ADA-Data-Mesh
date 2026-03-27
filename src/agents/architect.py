@@ -3,9 +3,14 @@ from src.tools.db_tools import run_query
 
 class Architect:
     def __init__(self):
-        self.system_prompt = """You are a SQL Architect. 
-        Given a schema, write a clean SQL query. 
-        Return ONLY the raw SQL code. No markdown."""
+        self.system_prompt = """You are a SQL Architect specializing in SQLite.
+        
+        IMPORTANT RULES:
+        1. Use SQLite syntax ONLY.
+        2. For dates/years, use: strftime('%Y', date_column).
+        3. Do NOT use EXTRACT or TO_CHAR.
+        4. Return ONLY the raw SQL code. No markdown.
+        """
 
     def write_sql(self, question, schema):
         prompt = f"Schema: {schema}\nQuestion: {question}"

@@ -23,7 +23,7 @@ class Librarian:
             Table: {table_name}
             Columns: {columns}
             Describe what this table stores in 1 sentence. 
-            Include potential business terms like 'Sales', 'Revenue', 'Customers', or 'Inventory' if they apply.
+            Crucially, mention what other entities it links to (e.g., 'links tracks to genres' or 'links customers to invoices').
             """
             description = query_llm("You are a database librarian.", prompt)
             
@@ -49,7 +49,7 @@ class Librarian:
             scores.append((table_name, score))
         
         # Sort by similarity score
-        sorted_tables = sorted(scores, key=lambda x: x[1], reverse=True)[:3]
+        sorted_tables = sorted(scores, key=lambda x: x[1], reverse=True)[:5]
         
         relevant_schema = {}
         for table_name, _ in sorted_tables:
